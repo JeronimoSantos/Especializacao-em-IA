@@ -258,3 +258,87 @@ Para humanos, saber é quase binário: ou você sabe a capital da França, ou n�
 Para um LLM, "saber" é uma probabilidade contínua
 
 O modelo tem um sinal interno de "quão certo eu estou", mas não tem acesso a ele.  Ele foi treinado para sempre gerar a próxima palavra, seu conhecimento é um gradiente difuso (não um arquivo), e o "não sei" que ele diz é um comportamento aprendido — não uma auto-avaliação genuína.
+
+## Sobre Arquitetura Transformer e Singularidade
+
+Arquitetura Transformer
+### O problema que ela resolveu
+
+Antes do Transformer (2017), os modelos processavam texto sequencialmente (RNNs): palavra 1 → palavra 2 → palavra 3… Cada palavra só "via" o que já passou. Problemas:
+
+- Lento (não paraleliza)
+- Esquece o começo de frases longas (o "estado" vai se degradando) 
+
+A ideia central: Self-Attention
+
+O Transformer elimina a sequência. Todas as palavras são processadas ao mesmo tempo, e cada uma "olha" para todas as outras para decidir o que é relevante.
+
+> Analogia: imagine uma sala com 10 pessoas. Em vez de uma fila onde cada um repassa o recado ao próximo (RNN), todo mundo fala com todo mundo ao mesmo tempo e decide "quem é relevante pra mim agora" (Transformer). 
+
+### Como funciona (simplificado)
+
+Cada token gera 3 vetores:
+
+| Vetor | Pergunta que responde |
+|-------|-----------------------|
+| Query (Q) | "O que eu estou procurando?" |
+| Key (K) | "O que eu tenho pra oferecer?" |
+| Value (V) | "Qual é a informação real?" |
+
+O token calcula: "Meu Q bate com quais Ks da sala?" → quanto mais "bate", mais peso ele dá ao V daquele token.
+```
+"O gato preto dormiu no sofá"
+
+Para o token "dormiu":
+  Q("dormiu") vs K("gato")  → alto peso  (quem dormiu?)
+  Q("dormiu") vs K("sofá")  → alto peso  (onde?)
+  Q("dormiu") vs K("preto") → peso baixo (pouco relevante)   
+```
+
+### Multi-Head
+
+Em vez de uma "sala de conversa", o modelo tem várias salas em paralelo (ex: 32, 64, 128 heads). Cada head aprende a prestar atenção em coisas diferentes:
+
+- Head 1: relações gramaticais (sujeito → verbo)
+- Head 2: referências ("ele" → "gato")
+- Head 3: contexto semântico (palavras relacionadas)
+
+Depois, os resultados de todos os heads são combinados.
+
+O "restante" do bloco
+
+Cada camada do Transformer é:
+```
+Token → [Self-Attention] → [Feed-Forward (rede neural simples)] → Token atualizado
+         "quem importa?"      "refinar meu entendimento"   
+```
+
+Isso se repete N vezes (ex: 32, 48, 128 camadas). Cada camada refina um pouco mais a representação.
+
+### Por que "Attention Is All You Need"?
+
+Porque a atenção substituiu a recorrência.  Não precisa mais de "memória de estado" passada de palavra em palavra — a atenção conecta qualquer posição com qualquer outra diretamente, em paralelo. 
+
+Variantes que existem hoje
+
+| Tipo | Usa | Exemplo |
+|------|-----|---------|
+| Encoder-only | Só "lê" e entende | BERT |
+| Decoder-only | Só "gera" (previsão de próximo token) | GPT, LLaMA, Gemini, Claude |
+| Encoder-Decoder | Lê + gera | T5, original 2017 |
+
+Os LLMs atuais (ChatGPT, Gemini, Claude) são decoder-only: recebem o prompt, e preveem o próximo token repetidamente. 
+
+## Singularidade (de IA) o que é?
+
+O momento em que a IA ultrapassa a capacidade cognitiva humana de forma ampla e generalizada — e, a partir daí, melhora a si mesma num ciclo que acelera exponencialmente, tornando-se imprevisível. 
+
+> Analogia: é como se você tivesse um assistente que, em um dia, se torna melhor que você em tudo (programar, pesquisar, criar, decidir) — e no dia seguinte ele se torna 2x melhor que si mesmo. E no outro, 4x. Em poucas semanas, já não dá pra prever o que ele vai fazer.
+
+### Por que é tão difícil prever?
+
+- Não sabemos se a arquitetura atual (Transformer) é suficiente para AGI, ou se precisa de algo novo (memória contínua, aprendizado contínuo, mundo interno).
+- Escalar não é o mesmo que generalizar. Modelos maiores ficam melhores, mas ainda "quebram" em tarefas que um humano de 8 anos resolveria (raciocínio causal, senso comum, planejamento de longo prazo).
+- O gargalo pode não ser compute. Pode ser algorítmico, de dados, ou de segurança — e aí a curva "plana" de repente.
+
+Em resumo: o Transformer é o motor (a arquitetura que permite processar e gerar linguagem em escala), e a Singularidade é a pergunta: "quando esse motor vai se tornar tão poderoso que deixa de ser controlável por quem o dirige?" — e a resposta honesta é: ninguém sabe, e o intervalo de estimativas vai de 2027 a 2060+.
