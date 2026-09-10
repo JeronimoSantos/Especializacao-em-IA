@@ -14,7 +14,7 @@ Aqui está uma simples tabela, númerada da primeira aula até a última aula co
 | Tópico da Aula | N° | Status |
 |----------------|----|--------|
 | Fundamentos: o que é isso que a gente chama de IA? | 01 | ✅ |
-| Prompt e Context Engineering | 02 | 📝 |
+| Prompt e Context Engineering | 02 | ✅ |
 | Onboarding da IA no projeto (Rules/AGENTS.md) + Skills | 03 | 📝 |
 | Tools, MCPs e Segurança (OWASP para LLM) | 04 | 📝 |
 | Engenharia de software na era da IA: clean code, DDD e BDD | 05 | 📝 |
